@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math 111 Quiz Game</title>
+
+    <style>
+        body {
+            background-color: #C8A2C8;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        h1 {
+            font-size: 36px;
+            margin-bottom: 20px; /* Add some space between title and game container */
+        }
+
+        #game-container {
+            text-align: center;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        /* Style for the buttons */
+        .btn-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .btn-container button {
+            flex: 1;
+            padding: 10px;
+            font-size: 16px;
+        }
+
+        /* Style for the bottom right text */
+        .bottom-right-text {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            margin: 10px;
+            font-size: 14px;
+            color: #333; /* Text color */
+        }
+    </style>
+</head>
+<body>
+    <h1>Math 111: Quiz Game</h1>
+    <div id="game-container">
+        <button id="start-button" onclick="startGame()">Start Game</button>
+    </div>
+
+    <!-- Add the bottom right text -->
+    <div class="bottom-right-text">Carlos Lorenzo S. Lavares</div>
+
+    <script>
+        let score = 0;
+        let questionNumber = 0;
+        let hintsUsed = 0;
+        let continuePlaying = true;
+
+        // Define an array of sequence questions and their correct answers
+        const sequences = [
+            {
+                type: "Arithmetic Sequence",
+                question: "Find the missing number in the arithmetic sequence: 5, 10, __, 20, 25.",
+                options: [12, 15, 18],
+                correctAnswer: 15,
+                hint: "The common difference between terms is 5."
+            },
+            {
+                type: "Arithmetic Sequence",
+                question: "If the first term of an arithmetic sequence is 3, and the common difference is 4, what is the 10th term?",
+                options: [35, 36, 39],
+                correctAnswer: 39,
+                hint: "You can use the formula: a_n = a_1 + (n - 1)d."
+            },
+            {
+                type: "Arithmetic Sequence",
+                question: "Given the arithmetic sequence: 2, 5, 8, 11, __, what is the next term?",
+                options: [12, 14, 15],
+                correctAnswer: 14,
+                hint: "The common difference between terms is 3."
+            },
+            {
+                type: "Geometric Sequence",
+                question: "Determine the missing number in the geometric sequence: 2, 6, __, 54, 162.",
+                options: [12, 18, 27],
+                correctAnswer: 18,
+                hint: "The common ratio between terms is 3."
+            },
+            {
+                type: "Geometric Sequence",
+                question: "If the first term of a geometric sequence is 4, and the common ratio is 3, what is the 7th term?",
+                options: [2916, 108, 729],
+                correctAnswer: 2916,
+                hint: "You can use the formula: a_n = a_1 * r^(n-1)."
+            },
+            {
+                type: "Geometric Sequence",
+                question: "In a geometric sequence: 3, 9, 27, __, 243, what comes after 243?",
+                options: [729, 81, 18],
+                correctAnswer: 729,
+                hint: "The common ratio between terms is 9."
+            },
+            {
+                type: "Fibonacci Sequence",
+                question: "Calculate the next three numbers in the Fibonacci sequence after 1, 1, 2, 3, 5, __, __, __.",
+                options: [8, 13, 21],
+                correctAnswer: "21",
+                hint: "The Fibonacci sequence starts with 1, 1, and each subsequent number is the sum of the two preceding numbers."
+            },
+            {
+                type: "Fibonacci Sequence",
+                question: "What is the sum of the first 10 numbers in the Fibonacci sequence?",
+                options: [120, 150, 143],
+                correctAnswer: 143,
+                hint: "You need to calculate the sum of the first 10 Fibonacci numbers."
+            },
+            {
+                type: "Fibonacci Sequence",
+                question: "In the Fibonacci sequence, if F(4) = 3 and F(5) = 5, what is F(6)?",
+                options: [8, 13, 21],
+                correctAnswer: 8,
+                hint: "In the Fibonacci sequence, each number is the sum of the two preceding numbers."
+            },
+            // Add more questions here
+        ];
+
+        function startGame() {
+            score = 0;
+            questionNumber = 0;
+            hintsUsed = 0;
+            continuePlaying = true;
+            askQuestion();
+        }
+
+        function askQuestion() {
+            if (questionNumber < sequences.length && continuePlaying) {
+                const questionObj = sequences[questionNumber];
+                const questionText = questionObj.question;
+                const options = questionObj.options;
+
+                // Shuffle the answer options randomly
+                const shuffledOptions = shuffleArray(options);
+
+                const answerButtons = shuffledOptions.map(answer => {
+                    return `<button onclick="checkAnswer('${answer}', '${questionObj.correctAnswer}')">${answer}</button>`;
+                }).join(' ');
+
+                const hintButton = `<button onclick="showHint('${questionObj.hint}')">Hint</button>`;
+
+                document.getElementById('game-container').innerHTML = `
+                    <h2>${questionObj.type}</h2>
+                    <p>${questionText}</p>
+                    ${answerButtons}
+                    ${hintButton}
+                `;
+            } else {
+                endGame();
+            }
+        }
+
+        function checkAnswer(userChoice, correctAnswer) {
+            if (userChoice === correctAnswer) {
+                alert("Well done!");
+                score++;
+            } else {
+                alert(`Sorry, that's incorrect. The correct answer is ${correctAnswer}.`);
+            }
+
+            questionNumber++;
+
+            if (questionNumber < sequences.length) {
+                continuePlaying = confirm(`Your score is ${score}. Do you want to continue playing?`);
+                askQuestion();
+            } else {
+                continuePlaying = false;
+                endGame();
+            }
+        }
+
+        function showHint(hintText) {
+            hintsUsed++;
+            alert(`Hint: ${hintText}`);
+        }
+
+        function endGame() {
+            alert(`Thanks for playing! Your final score is ${score}. The amount of hints you used is ${hintsUsed}.`);
+            document.getElementById('game-container').innerHTML = `
+                <p>Your final score is ${score}. The amount of hints you used is ${hintsUsed}.</p>
+                <button id="start-button" onclick="startGame()">Play Again</button>
+            `;
+        }
+
+        // Helper function to shuffle an array randomly
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+    </script>
+</body>
+</html>
